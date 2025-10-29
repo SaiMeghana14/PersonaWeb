@@ -10,5 +10,15 @@ const storage = {
     return new Promise((res) => {
       chrome.storage.local.set({ [key]: val }, () => res(true));
     });
+  },
+  async remove(key) {
+    return new Promise((res) => {
+      chrome.storage.local.remove([key], () => res(true));
+    });
+  },
+  async clearAll() {
+    return new Promise((res) => {
+      chrome.storage.local.clear(() => res(true));
+    });
   }
 };
