@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PersonaWeb Sidebar</title>
+<link rel="stylesheet" href="../src/sidebar.css">
+</head>
+<body>
+  <div id="app" class="light">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../icons/icon-48.png" alt="P" />
+        <div class="title">PersonaWeb</div>
+      </div>
+      <div class="mode-switch">
+        <select id="modeSelect">
+          <option value="learn">Learn</option>
+          <option value="work">Work</option>
+          <option value="explore">Explore</option>
+        </select>
+        <button id="closeBtn" title="Close">✕</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="input-area">
+        <textarea id="selectedText" placeholder="Selected text will appear here..." rows="4"></textarea>
+        <div class="action-row">
+          <!-- top quick actions -->
+          <button class="action-btn" data-action="summarize">Summarize</button>
+          <button class="action-btn" data-action="simplify">Simplify</button>
+          <button class="action-btn" data-action="polish">Polish</button>
+          <button class="action-btn" data-action="translate">Translate</button>
+          <button class="action-btn" data-action="flashcard">Flashcard</button>
+          <button class="action-btn" data-action="quiz">Quiz me</button>
+        </div>
+      </section>
+
+      <section id="resultArea" class="results">
+        <div class="placeholder">Results will appear here. Try selecting text on the page and pressing the floating P button.</div>
+      </section>
+
+      <section class="history">
+        <div class="history-title">History</div>
+        <ul id="historyList"></ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="theme-toggle">
+        <label><input id="themeToggle" type="checkbox"> Dark</label>
+      </div>
+      <div class="version">v1.0</div>
+    </footer>
+  </div>
+
+<script src="../src/utils/storage.js"></script>
+<script src="../src/utils/ai_clients.js"></script>
+<script src="../src/sidebar.js"></script>
+</body>
+</html>
