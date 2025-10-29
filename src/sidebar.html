@@ -14,7 +14,7 @@
         <div class="title">PersonaWeb</div>
       </div>
       <div class="mode-switch">
-        <select id="modeSelect">
+        <select id="modeSelect" aria-label="Select mode">
           <option value="learn">Learn</option>
           <option value="work">Work</option>
           <option value="explore">Explore</option>
@@ -24,10 +24,18 @@
     </header>
 
     <main class="content">
-      <section class="input-area">
+      <section class="onboarding" id="onboarding">
+        <h2>Welcome to PersonaWeb</h2>
+        <p>Transform web pages instantly — simplify, translate, quiz, and reply — all on your device.</p>
+        <div class="onboard-actions">
+          <button id="startBtn">Try a demo text</button>
+          <button id="learnMore">How it works</button>
+        </div>
+      </section>
+
+      <section class="input-area" id="mainControls" style="display:none">
         <textarea id="selectedText" placeholder="Selected text will appear here..." rows="4"></textarea>
-        <div class="action-row">
-          <!-- top quick actions -->
+        <div class="action-row" role="toolbar" aria-label="Quick actions">
           <button class="action-btn" data-action="summarize">Summarize</button>
           <button class="action-btn" data-action="simplify">Simplify</button>
           <button class="action-btn" data-action="polish">Polish</button>
@@ -39,6 +47,18 @@
 
       <section id="resultArea" class="results">
         <div class="placeholder">Results will appear here. Try selecting text on the page and pressing the floating P button.</div>
+      </section>
+
+      <section class="persona-settings">
+        <h3>Persona</h3>
+        <div class="persona-row">
+          <label>Tone</label>
+          <select id="toneSelect"><option>Neutral</option><option>Friendly</option><option>Professional</option></select>
+        </div>
+        <div class="persona-row">
+          <label>Reading level</label>
+          <select id="levelSelect"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
+        </div>
       </section>
 
       <section class="history">
