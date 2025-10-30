@@ -1,4 +1,3 @@
-// src/sidebar.js (improved)
 (() => {
   const selectedTextEl = document.getElementById('selectedText');
   const resultArea = document.getElementById('resultArea');
@@ -23,7 +22,6 @@
     levelSelect.value = persona.level || 'Intermediate';
     modeSelect.value = (await storage.get('mode')) || 'learn';
 
-    // Show onboarding only on first-run
     const seen = await storage.get('seenOnboarding');
     if (!seen) {
       onboarding.style.display = 'block';
@@ -35,30 +33,26 @@
     refreshHistory();
   }
 
-  // Theme
-  const app = document.getElementById('app');
   function setDark(d) {
+    const app = document.getElementById('app');
     app.classList.toggle('dark', d);
     storage.set('dark', d);
     chrome.runtime.sendMessage({ type: 'THEME_UPDATED', dark: d });
   }
   themeToggle.addEventListener('change', (e) => setDark(e.target.checked));
 
-  // Onboarding actions
   startBtn.addEventListener('click', async () => {
     onboarding.style.display = 'none';
     mainControls.style.display = 'block';
     await storage.set('seenOnboarding', true);
-    // populate demo text
     const demo = `Photosynthesis is the process by which plants convert light energy into chemical energy. It involves chlorophyll absorbing light and converting carbon dioxide and water into glucose and oxygen.`;
     selectedTextEl.value = demo;
     await performAction('summarize', demo);
   });
-  learnMore.addEventListener('click', () => alert('PersonaWeb runs client-side AI (Gemini Nano etc.). Replace the ai_clients mock with built-in API calls when you have preview access.'));
+  learnMore.addEventListener('click', () => alert('PersonaWeb runs client-side AI when available, otherwise securely uses cloud fallback. Replace ai_clients mocks with official calls for full capabilities.'));
 
-  // Persona settings save
-  toneSelect.addEventListener('change', () => savePersona());
-  levelSelect.addEventListener('change', () => savePersona());
+  toneSelect.addEventListener('change', savePersona);
+  levelSelect.addEventListener('change', savePersona);
   modeSelect.addEventListener('change', () => storage.set('mode', modeSelect.value));
 
   async function savePersona() {
@@ -66,7 +60,6 @@
     await storage.set('persona', persona);
   }
 
-  // History list
   async function refreshHistory() {
     const hist = await storage.get('history') || [];
     historyList.innerHTML = hist.slice().reverse().map(item => `<li><strong>${escapeHtml(item.type)}</strong><div style="font-size:12px;color:#8892a8">${new Date(item.t||Date.now()).toLocaleString()}</div><div style="margin-top:6px;font-size:13px">${escapeHtml((item.summary||'').slice(0,200))}</div></li>`).join('');
@@ -89,19 +82,16 @@
     if (msg?.type === 'PERSONAWEB_INPUT') {
       selectedTextEl.value = msg.text || '';
       if (msg.autoAction) performAction(msg.autoAction, msg.text);
-      // show main area
       onboarding.style.display = 'none';
       mainControls.style.display = 'block';
     }
   });
 
   closeBtn.addEventListener('click', () => {
-    // remove iframe by sending a top-level message to the content script
     window.top.postMessage({ type: 'PERSONAWEB_CLOSE' }, '*');
   });
 
   function escapeHtml(s='') { return s.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
   function showResult(html) { resultArea.innerHTML = `<div class="result-content">${html}</div>`; }
 
   async function performAction(action, text) {
@@ -141,6 +131,5 @@
     return cards.map(c => `<div style="padding:10px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.02)"><strong>${escapeHtml(c.title||'Card')}</strong><div style="margin-top:6px">${escapeHtml(c.body||'')}</div></div>`).join('');
   }
 
-  // Init on load
   init();
 })();
