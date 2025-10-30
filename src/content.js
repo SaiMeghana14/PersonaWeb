@@ -1,4 +1,3 @@
-// src/content.js (polished)
 (() => {
   const FLOAT_ID = 'personaweb-float-btn';
   let floatBtn = null;
@@ -36,46 +35,35 @@
     floatBtn.addEventListener('click', onFloatClick);
     floatBtn.addEventListener('mouseenter', () => floatBtn.style.transform = 'scale(1.03)');
     floatBtn.addEventListener('mouseleave', () => floatBtn.style.transform = 'scale(1)');
-    // set theme icon on create
+    // theme icon initial set
     chrome.storage.local.get(['dark'], (items) => setThemeIcon(Boolean(items.dark)));
   }
 
   function setThemeIcon(isDark) {
     const img = document.getElementById('persona-icon');
     if (!img) return;
-    // If you later add dark version of icons, toggle here.
     img.src = chrome.runtime.getURL('icons/icon-48.png');
-    // Optionally swap to icons/icon-48-dark.png if exists:
-    // img.src = chrome.runtime.getURL(isDark ? 'icons/icon-48-dark.png' : 'icons/icon-48.png');
-  }
-
-  function removeFloatButton() {
-    const el = document.getElementById(FLOAT_ID);
-    if (el) el.remove();
   }
 
   function onFloatClick(e) {
     const selection = window.getSelection().toString();
-    // Send coordinates relative to viewport (for sidebar positioning heuristic)
     const rect = { x: e.clientX, y: e.clientY };
     chrome.runtime.sendMessage({ type: 'OPEN_SIDEBAR', payload: { selection, rect }});
   }
 
   function positionFloat(x, y) {
     if (!floatBtn) createFloatButton();
-    // Keep button slightly to the right of selection (avoid covering)
     const left = Math.min(Math.max(8, x + window.scrollX + 12), window.innerWidth - 60 + window.scrollX);
     const top = Math.min(Math.max(8, y + window.scrollY - 40), window.scrollY + window.innerHeight - 60);
     floatBtn.style.left = `${left}px`;
     floatBtn.style.top = `${top}px`;
     floatBtn.style.opacity = '1';
     floatBtn.style.transform = 'scale(1)';
-    // auto-hide after 6s of inactivity
     if (hideTimeout) clearTimeout(hideTimeout);
     hideTimeout = setTimeout(() => { floatBtn.style.opacity = '0'; }, 6000);
   }
 
-  // Show button on text selection
+  // Show button when selection exists
   document.addEventListener('selectionchange', () => {
     const sel = window.getSelection();
     const txt = sel?.toString?.().trim();
@@ -88,19 +76,26 @@
       const rect = range.getBoundingClientRect();
       positionFloat(rect.right, rect.top);
     } catch (e) {
-      // fallback to mouse position if bounding rect not available
       positionFloat(window.innerWidth / 2 - 40, 100);
     }
   });
 
-  // Listen for messages from background / popup (same as before)
-  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  // Listen for messages to mount the sidebar or run actions
+  chrome.runtime.onMessage.addListener((msg, sender) => {
     if (msg?.type === 'MOUNT_SIDEBAR') {
       mountSidebar(msg.payload);
     } else if (msg?.type === 'CONTEXT_ACTION') {
       mountSidebar({ selection: msg.text, autoAction: msg.action });
     } else if (msg?.type === 'THEME_UPDATED') {
       setThemeIcon(Boolean(msg.dark));
+    }
+  });
+
+  // Remove sidebar trigger; also respond to top-level close
+  window.addEventListener('message', (evt) => {
+    if (evt.data?.type === 'PERSONAWEB_CLOSE') {
+      const iframe = document.getElementById('personaweb-sidebar-iframe');
+      if (iframe) iframe.remove();
     }
   });
 
@@ -132,6 +127,5 @@
     };
   }
 
-  // Initialize float button
   createFloatButton();
 })();
